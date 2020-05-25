@@ -1,0 +1,25 @@
+<section id="cover">
+  <div id="cover-content">
+    <h1>
+      {{{copy.title}}}
+    </h1>
+    <h2>
+      {{{copy.subtitle}}}
+    </h2>
+  </div>
+</section>
+<div id="attribution">
+  {{#each copy.authors}}
+    {{{this.pre}}}
+    <a href="{{{this.link}}}" target="_blank">
+      {{{this.name}}}
+    </a>
+  {{/each}}
+</div>
+<section id="intro">
+  {{#each copy.intro}}
+    <p>
+      {{{this.value}}}
+    </p>
+  {{/each}}
+</section>
