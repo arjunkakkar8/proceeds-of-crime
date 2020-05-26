@@ -6,17 +6,17 @@ const circles = $svg.selectAll("circle");
 const radius = 10;
 
 const $hoverBox = d3.select("#graphic-hover");
+const $mainBoxes = d3.selectAll(".main-text");
 
 function setupCircles() {
   circles.nodes().forEach((el, i) => {
     const data = el.dataset;
+    const id = createId(data);
     d3.select(el)
-      .attr("id", createId(data))
-      .on("mouseenter", () =>
-        highlight(data.influence, createId(data), data.hover, this)
-      )
+      .attr("id", id)
+      .on("mouseenter", () => highlight(data.influence, id, data.hover))
       .on("mouseleave", clearHighlight)
-      .on("click", clickHandler);
+      .on("click", () => clickHandler(data.influence, id));
   });
 }
 
@@ -26,9 +26,7 @@ function resizeCircles() {
     const xMult = data.type === "international" ? intMult : domMult;
     const xPos = padding.left + width * xMult;
     const yPos = padding.top + height * getYFrac(data.date);
-    console.log(data);
     d3.select(el).attr("r", radius).attr("cx", xPos).attr("cy", yPos);
-    console.log([el, i]);
   });
 }
 
@@ -50,15 +48,17 @@ function getYFrac(date) {
   return frac;
 }
 
-function highlight(inf, self, hover, node) {
-  const influences = inf.split(",");
-  influences.forEach((id) =>
-    d3
-      .select(`#${id}`)
-      .transition()
-      .attr("r", radius * 1.4)
-      .attr("fill", "orange")
-  );
+function highlight(inf, self, hover) {
+  if (inf.trim() != "") {
+    const influences = inf.split(",");
+    influences.forEach((id) =>
+      d3
+        .select(`#${id.trim()}`)
+        .transition()
+        .attr("r", radius * 1.4)
+        .attr("fill", "orange")
+    );
+  }
 
   d3.select(`#${self}`)
     .transition()
@@ -83,6 +83,15 @@ function clearHighlight() {
   $hoverBox.classed("visible", false);
 }
 
-function clickHandler() {}
+function clickHandler(inf, self) {
+  $mainBoxes.classed("visible", false);
+
+  const influences = inf.split(",");
+  [...influences, self].forEach((id, i) => {
+    const data = d3.select(`#${id.trim()}`).node().dataset;
+    d3.select(`#graphic-main-${i}`).classed("visible", true).html(data.main);
+    console.log([id, i]);
+  });
+}
 
 export { setupCircles, resizeCircles };

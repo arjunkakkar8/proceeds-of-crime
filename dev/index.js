@@ -190,19 +190,33 @@ var _index = require("./index");
 
 var _base = require("./base");
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 var $svg = d3.select("#graphic-container");
 var circles = $svg.selectAll("circle");
 var radius = 10;
 var $hoverBox = d3.select("#graphic-hover");
+var $mainBoxes = d3.selectAll(".main-text");
 
 function setupCircles() {
-  var _this = this;
-
   circles.nodes().forEach(function (el, i) {
     var data = el.dataset;
-    d3.select(el).attr("id", createId(data)).on("mouseenter", function () {
-      return highlight(data.influence, createId(data), data.hover, _this);
-    }).on("mouseleave", clearHighlight).on("click", clickHandler);
+    var id = createId(data);
+    d3.select(el).attr("id", id).on("mouseenter", function () {
+      return highlight(data.influence, id, data.hover);
+    }).on("mouseleave", clearHighlight).on("click", function () {
+      return clickHandler(data.influence, id);
+    });
   });
 }
 
@@ -212,9 +226,7 @@ function resizeCircles() {
     var xMult = data.type === "international" ? _base.intMult : _base.domMult;
     var xPos = _base.padding.left + _index.width * xMult;
     var yPos = _base.padding.top + _index.height * getYFrac(data.date);
-    console.log(data);
     d3.select(el).attr("r", radius).attr("cx", xPos).attr("cy", yPos);
-    console.log([el, i]);
   });
 }
 
@@ -231,11 +243,14 @@ function getYFrac(date) {
   return frac;
 }
 
-function highlight(inf, self, hover, node) {
-  var influences = inf.split(",");
-  influences.forEach(function (id) {
-    return d3.select("#".concat(id)).transition().attr("r", radius * 1.4).attr("fill", "orange");
-  });
+function highlight(inf, self, hover) {
+  if (inf.trim() != "") {
+    var influences = inf.split(",");
+    influences.forEach(function (id) {
+      return d3.select("#".concat(id.trim())).transition().attr("r", radius * 1.4).attr("fill", "orange");
+    });
+  }
+
   d3.select("#".concat(self)).transition().attr("r", radius * 1.4).attr("fill", "yellow");
   var pos = d3.select("#".concat(self)).node().getBoundingClientRect();
   $hoverBox.classed("visible", true).classed("right", self.slice(0, 1) === "d").style("left", "".concat(pos.x + pos.width / 2, "px")).style("top", "".concat(pos.y + pos.height / 2, "px")).html(hover);
@@ -248,7 +263,15 @@ function clearHighlight() {
   $hoverBox.classed("visible", false);
 }
 
-function clickHandler() {}
+function clickHandler(inf, self) {
+  $mainBoxes.classed("visible", false);
+  var influences = inf.split(",");
+  [].concat(_toConsumableArray(influences), [self]).forEach(function (id, i) {
+    var data = d3.select("#".concat(id.trim())).node().dataset;
+    d3.select("#graphic-main-".concat(i)).classed("visible", true).html(data.main);
+    console.log([id, i]);
+  });
+}
 },{"./index":"index.js","./base":"base.js"}],"index.js":[function(require,module,exports) {
 "use strict";
 
