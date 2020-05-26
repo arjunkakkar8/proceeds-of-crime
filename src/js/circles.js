@@ -102,6 +102,7 @@ function clickHandler(inf, self) {
       d3.select(`#graphic-main-${i}`)
         .classed("visible", true)
         .classed("right", id.trim().slice(0, 1) === "i")
+        .classed("selection", id === self)
         .html(data.main);
     }
   });

@@ -281,7 +281,7 @@ function clickHandler(inf, self) {
   [].concat(_toConsumableArray(influences), [self]).forEach(function (id, i) {
     if (id.trim() != "") {
       var data = d3.select("#".concat(id.trim())).node().dataset;
-      d3.select("#graphic-main-".concat(i)).classed("visible", true).classed("right", id.trim().slice(0, 1) === "i").html(data.main);
+      d3.select("#graphic-main-".concat(i)).classed("visible", true).classed("right", id.trim().slice(0, 1) === "i").classed("selection", id === self).html(data.main);
     }
   });
   [].concat(_toConsumableArray(influences), [self]).forEach(function (id, i) {

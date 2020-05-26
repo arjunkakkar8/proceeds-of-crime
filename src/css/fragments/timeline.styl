@@ -32,6 +32,7 @@
 #graphic-main-container
     display flex
     flex-flow column
+    justify-content center
     height 100%
     width 55%
     position absolute
@@ -39,8 +40,8 @@
 
 .main-text
     flex-grow 1
-    max-height 20%
-    margin 5% 0
+    max-height 15%
+    margin 2% 0
     padding 5% 5%
     box-sizing border-box
     display none
@@ -56,6 +57,9 @@
         display block
     &.right
         left 5%
+    &.selection
+        max-height 50%
+        flex-grow 3
 
 path
     opacity 0
