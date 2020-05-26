@@ -141,21 +141,21 @@ var padding = {
 exports.endDate = endDate;
 exports.startDate = startDate;
 exports.padding = padding;
-var domMult = 0.2,
-    intMult = 0.9;
+var domMult = 0.15,
+    intMult = 0.85;
 exports.intMult = intMult;
 exports.domMult = domMult;
 var yearLine, domLine, intLine;
 
 function setupBase() {
-  var baseGroup = $svg.append("g").attr("id", "base-group");
+  var baseGroup = $svg.select("#base-group");
   var yearGroup = baseGroup.append("g").attr("id", "year-group");
 
   for (var i = startDate; i <= endDate; i++) {
     if (i % 10 == 0) {
-      yearGroup.append("text").text(i).attr("id", "year-marker-".concat(i)).attr("class", "year-marker").attr("alignment-baseline", "middle").attr("text-anchor", "middle");
+      yearGroup.append("text").text(i).attr("id", "year-marker-".concat(i)).attr("class", "year-marker-text").attr("alignment-baseline", "middle").attr("text-anchor", "middle");
     } else {
-      yearGroup.append("line").attr("id", "year-marker-".concat(i)).attr("class", "year-marker");
+      yearGroup.append("line").attr("id", "year-marker-".concat(i)).attr("class", "year-marker-dash");
     }
   }
 
@@ -192,11 +192,17 @@ var _base = require("./base");
 
 var $svg = d3.select("#graphic-container");
 var circles = $svg.selectAll("circle");
+var radius = 10;
+var $hoverBox = d3.select("#graphic-hover");
 
 function setupCircles() {
+  var _this = this;
+
   circles.nodes().forEach(function (el, i) {
     var data = el.dataset;
-    d3.select(el).attr("id", createId(data)).on("mouseenter", highlight).on("mouseleave", clearHighlight).on("click", clickHandler);
+    d3.select(el).attr("id", createId(data)).on("mouseenter", function () {
+      return highlight(data.influence, createId(data), data.hover, _this);
+    }).on("mouseleave", clearHighlight).on("click", clickHandler);
   });
 }
 
@@ -207,7 +213,7 @@ function resizeCircles() {
     var xPos = _base.padding.left + _index.width * xMult;
     var yPos = _base.padding.top + _index.height * getYFrac(data.date);
     console.log(data);
-    d3.select(el).attr("r", 5).attr("cx", xPos).attr("cy", yPos);
+    d3.select(el).attr("r", radius).attr("cx", xPos).attr("cy", yPos);
     console.log([el, i]);
   });
 }
@@ -215,19 +221,32 @@ function resizeCircles() {
 function createId(data) {
   var date = data.date;
   var type = data.type;
-  return date.replace(/\//gi, "") + type.slice(0, 1);
+  return type.slice(0, 1) + date.replace(/\//gi, "");
 }
 
 function getYFrac(date) {
   var frac = 0;
   var comps = date.split("/");
-  frac += (Number(comps[2]) + Number(comps[0]) / 12 + Number(comps[1]) / 365 - _base.startDate) / (_base.endDate - _base.startDate);
+  frac += (Number(comps[2]) + Number(comps[1]) / 12 + Number(comps[0]) / 365 - _base.startDate) / (_base.endDate - _base.startDate);
   return frac;
 }
 
-function highlight() {}
+function highlight(inf, self, hover, node) {
+  var influences = inf.split(",");
+  influences.forEach(function (id) {
+    return d3.select("#".concat(id)).transition().attr("r", radius * 1.4).attr("fill", "orange");
+  });
+  d3.select("#".concat(self)).transition().attr("r", radius * 1.4).attr("fill", "yellow");
+  var pos = d3.select("#".concat(self)).node().getBoundingClientRect();
+  $hoverBox.classed("visible", true).classed("right", self.slice(0, 1) === "d").style("left", "".concat(pos.x + pos.width / 2, "px")).style("top", "".concat(pos.y + pos.height / 2, "px")).html(hover);
+}
 
-function clearHighlight() {}
+function clearHighlight() {
+  circles.nodes().forEach(function (el, i) {
+    d3.select(el).transition().attr("r", radius).attr("fill", "black");
+  });
+  $hoverBox.classed("visible", false);
+}
 
 function clickHandler() {}
 },{"./index":"index.js","./base":"base.js"}],"index.js":[function(require,module,exports) {

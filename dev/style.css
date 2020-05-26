@@ -9,8 +9,25 @@
   opacity: 0.5;
   stroke-dasharray: 2, 2;
 }
-.year-marker {
+.year-marker-dash {
   stroke: #000;
+}
+#graphic-hover {
+  opacity: 0;
+  position: fixed;
+  pointer-events: none;
+  background-color: #fff;
+  max-width: 12%;
+  transform: translate(10%, -50%);
+  padding: 5px;
+  border: 1px solid #000;
+}
+#graphic-hover.visible {
+  opacity: 1;
+}
+#graphic-hover.right {
+  text-align: right;
+  transform: translate(-110%, -50%);
 }
 html,
 body {
@@ -26,7 +43,7 @@ body {
 }
 #cover {
   margin: 0;
-  padding: 5em 0 5em 0;
+  padding: 3em 0 3em 0;
   background-color: #4a4a4a;
 }
 #intro,
@@ -35,7 +52,7 @@ body {
 #attribution {
   width: 80%;
   max-width: 40em;
-  margin: auto;
+  margin: 5em auto;
 }
 #attribution {
   margin-top: 1em;
@@ -46,11 +63,8 @@ body {
   color: #000;
   text-decoration: none;
 }
-#intro {
-  margin-top: 5em;
-}
 h1 {
-  font-size: 3.2em;
+  font-size: 3.5em;
   color: #fff;
 }
 h2 {
