@@ -207,6 +207,7 @@ var circles = $svg.selectAll("circle");
 var radius = 10;
 var $hoverBox = d3.select("#graphic-hover");
 var $mainBoxes = d3.selectAll(".main-text");
+var clicked = [];
 
 function setupCircles() {
   circles.nodes().forEach(function (el, i) {
@@ -253,24 +254,51 @@ function highlight(inf, self, hover) {
 
   d3.select("#".concat(self)).transition().attr("r", radius * 1.4).attr("fill", "yellow");
   var pos = d3.select("#".concat(self)).node().getBoundingClientRect();
-  $hoverBox.classed("visible", true).classed("right", self.slice(0, 1) === "d").style("left", "".concat(pos.x + pos.width / 2, "px")).style("top", "".concat(pos.y + pos.height / 2, "px")).html(hover);
+
+  if (hover) {
+    $hoverBox.classed("visible", true).classed("right", self.slice(0, 1) === "d").style("left", "".concat(pos.x + pos.width / 2, "px")).style("top", "".concat(pos.y + pos.height / 2, "px")).html(hover);
+  }
 }
 
 function clearHighlight() {
   circles.nodes().forEach(function (el, i) {
     d3.select(el).transition().attr("r", radius).attr("fill", "black");
   });
+
+  if (clicked[0]) {
+    highlight(clicked[0], clicked[1]);
+  }
+
   $hoverBox.classed("visible", false);
 }
 
 function clickHandler(inf, self) {
-  $mainBoxes.classed("visible", false);
+  $mainBoxes.classed("visible", false).classed("right", false);
+  d3.selectAll("path").classed("visible", false);
+  highlight(inf, self);
+  clicked = [inf, self];
   var influences = inf.split(",");
   [].concat(_toConsumableArray(influences), [self]).forEach(function (id, i) {
-    var data = d3.select("#".concat(id.trim())).node().dataset;
-    d3.select("#graphic-main-".concat(i)).classed("visible", true).html(data.main);
-    console.log([id, i]);
+    if (id.trim() != "") {
+      var data = d3.select("#".concat(id.trim())).node().dataset;
+      d3.select("#graphic-main-".concat(i)).classed("visible", true).classed("right", id.trim().slice(0, 1) === "i").html(data.main);
+    }
   });
+  [].concat(_toConsumableArray(influences), [self]).forEach(function (id, i) {
+    if (id.trim() != "") {
+      createPath(id, i);
+    }
+  });
+}
+
+function createPath(id, i) {
+  var offset = window.scrollY - d3.select("#timeline").node().offsetTop;
+  var dotPos = d3.select("#".concat(id.trim())).node().getBoundingClientRect();
+  var textPos = d3.select("#graphic-main-".concat(i)).node().getBoundingClientRect();
+  var leftSide = id.slice(0, 1) === "d";
+  console.log(dotPos);
+  console.log(textPos);
+  d3.select("#line-".concat(i)).classed("visible", true).attr("d", "M ".concat(dotPos.x + dotPos.width / 2, " ").concat(offset + dotPos.y + dotPos.height / 2, " L ").concat(dotPos.x + dotPos.width / 2 + 20 * (leftSide ? 1 : -1), " ").concat(offset + textPos.y + textPos.height, " H ").concat(textPos.x + textPos.width / 2));
 }
 },{"./index":"index.js","./base":"base.js"}],"index.js":[function(require,module,exports) {
 "use strict";

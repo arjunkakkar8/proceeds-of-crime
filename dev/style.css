@@ -3,11 +3,13 @@
   height: 100%;
 }
 #domLine,
-#intLine {
+#intLine,
+path {
   stroke-width: 1px;
   stroke: #000;
   opacity: 0.5;
   stroke-dasharray: 2, 2;
+  fill: none;
 }
 .year-marker-dash {
   stroke: #000;
@@ -21,6 +23,7 @@
   transform: translate(10%, -50%);
   padding: 5px;
   border: 1px solid #000;
+  transition: opacity 250ms;
 }
 #graphic-hover.visible {
   opacity: 1;
@@ -38,10 +41,33 @@
   left: 25%;
 }
 .main-text {
+  flex-grow: 1;
+  max-height: 20%;
+  margin: 5% 0;
+  padding: 5% 5%;
+  box-sizing: border-box;
   display: none;
+  width: 95%;
+  position: relative;
+  border: 3px solid #808080;
+  border-radius: 5px;
+  opacity: 0;
+  transition: opacity 250ms;
+  overflow-y: auto;
 }
 .main-text.visible {
+  opacity: 1;
   display: block;
+}
+.main-text.right {
+  left: 5%;
+}
+path {
+  opacity: 0;
+  transition: opacity 250ms;
+}
+path.visible {
+  opacity: 0.3;
 }
 html,
 body {
